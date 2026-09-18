@@ -1,0 +1,16 @@
+# Chocolate Vision — Python dependencies
+# Install into a virtualenv, then: pip install -r requirements.txt
+#
+# Ultralytics will pull a CPU or CUDA build of PyTorch depending on your
+# machine. For a specific CUDA wheel, install torch from https://pytorch.org
+# first, then rerun this file.
+
+albumentations==1.4.24
+Flask==3.1.2
+python-dotenv>=1.0
+numpy>=2.0
+opencv-python-headless>=4.8
+pillow>=10
+PyYAML>=6.0
+rembg==2.0.84
+ultralytics==8.4.152

@@ -1,0 +1,33 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+.env
+
+# Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Checkout logs (written at runtime)
+orders.csv
+orders/
+
+# Downloaded pretrained checkpoints
+yolov8*.pt
+yolo26*.pt
+mobile_sam.pt
+weights/
+
+# Regenerable or bulky training artifacts
+automated_raw_pieces/
+automated_raw_pieces_review/
+synthetic_dataset/
+runs/
+predictions/
+predictions_nano/
+predictions_s/
+box_layouts_check/
+chocolate_data.yaml
+*.cache
