@@ -434,9 +434,12 @@ select {
   display: grid;
   grid-template-columns: 1fr auto auto 2rem auto 2rem;
   align-items: center;
+  justify-items: center;
+  text-align: center;
   gap: 0.5rem;
   padding: 1.1rem 0;
   border-bottom: 1px solid #e3dac4;
+  font-family: Georgia, "Times New Roman", serif;
   font-size: 0.85rem;
   scroll-snap-align: center;
 }
@@ -452,9 +455,35 @@ select {
 .review-quantity {
   font-size: 0.85rem;
 }
+.review-quantity-input {
+  width: 2.2rem;
+  text-align: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  line-height: 1;
+  border: 1px solid #c9b987;
+  border-radius: 4px;
+  background: #fffaf0;
+  color: #2b2013;
+  padding: 0.2rem 0.1rem;
+}
+.review-quantity-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.review-quantity-input::-webkit-outer-spin-button,
+.review-quantity-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.review-quantity-input[type="number"] {
+  -moz-appearance: textfield;
+}
 .review-name {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.2rem;
 }
 .status-text {
