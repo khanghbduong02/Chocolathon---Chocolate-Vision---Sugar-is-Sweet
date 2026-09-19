@@ -13,3 +13,14 @@ export const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, 
 export const ASSEMBLYAI_WS_ENDPOINT = "wss://streaming.assemblyai.com/v3/ws";
 export const AUDIO_SAMPLE_RATE = 16000;
 export const TOKEN_ENDPOINT = `${API_BASE_URL}/api/assemblyai-token`;
+
+// fetch wrapper for backend calls. Free ngrok domains serve an HTML warning
+// page to browser requests (no CORS headers, so it shows up as a CORS error)
+// unless this header is present. The backend must list it in
+// Access-Control-Allow-Headers.
+export function apiFetch(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    headers: { ...options.headers, "ngrok-skip-browser-warning": "true" },
+  });
+}

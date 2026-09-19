@@ -5,6 +5,7 @@ import {
   ASSEMBLYAI_WS_ENDPOINT,
   AUDIO_SAMPLE_RATE,
   TOKEN_ENDPOINT,
+  apiFetch,
 } from "../constants/config";
 
 export function useAssemblyAiMic(onMatches, flavorCatalog) {
@@ -55,7 +56,7 @@ export function useAssemblyAiMic(onMatches, flavorCatalog) {
   const startMic = useCallback(async () => {
     setMicError(null);
     try {
-      const tokenRes = await fetch(TOKEN_ENDPOINT);
+      const tokenRes = await apiFetch(TOKEN_ENDPOINT);
       if (!tokenRes.ok) throw new Error(`Token endpoint returned ${tokenRes.status}`);
       const { token } = await tokenRes.json();
 

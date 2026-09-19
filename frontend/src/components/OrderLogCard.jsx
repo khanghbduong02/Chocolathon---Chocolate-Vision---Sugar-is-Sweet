@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import ItemEditor from "./ItemEditor";
+import { API_BASE_URL, apiFetch } from "../constants/config";
 
 export default function OrderLogCard({
   orderLog,
@@ -17,9 +18,34 @@ export default function OrderLogCard({
   const [deleteText, setDeleteText] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteError, setDeleteError] = useState("");
+  const [photoError, setPhotoError] = useState("");
 
   const wrapRef = useRef(null);
-  
+
+  // Fetch the photo with the ngrok header (plain <a href> can't send it, and
+  // a relative href would hit the Vercel domain instead of the backend),
+  // then open the blob in a new tab. The tab is opened synchronously on click
+  // so popup blockers allow it, then pointed at the blob once it loads.
+  async function openPhoto(event, order, kind) {
+    event.preventDefault();
+    setPhotoError("");
+    const win = window.open("", "_blank");
+    try {
+      const response = await apiFetch(
+        `${API_BASE_URL}/api/orders/${order.id}/photo/${kind}`,
+      );
+      if (!response.ok) throw new Error("Photo not found.");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      if (win) win.location.href = url;
+      else window.open(url, "_blank");
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch (error) {
+      if (win) win.close();
+      setPhotoError(error.message || "Could not load photo.");
+    }
+  }
+
   function handleClearClick() {
     if (orderLog.length === 0) return;
     setDeleteTarget(null);
@@ -38,6 +64,7 @@ export default function OrderLogCard({
 
   function startEdit(order) {
     setEditingId(order.id);
+    setPhotoError("");
     setEditItems(
       (order.items || []).map((item) => ({
         slug: item.slug,
@@ -163,19 +190,18 @@ export default function OrderLogCard({
                         {order.has_photo ? (
                           <div className="order-photo-links">
                             <a
-                              href={`/api/orders/${order.id}/photo/capture`}
-                              target="_blank"
-                              rel="noreferrer"
+                              href="#"
+                              onClick={(event) => openPhoto(event, order, "capture")}
                             >
                               Original photo
                             </a>
                             <a
-                              href={`/api/orders/${order.id}/photo/annotated`}
-                              target="_blank"
-                              rel="noreferrer"
+                              href="#"
+                              onClick={(event) => openPhoto(event, order, "annotated")}
                             >
                               Annotated photo (with classifications)
                             </a>
+                            {photoError && <p className="inline-error">{photoError}</p>}
                           </div>
                         ) : (
                           <p>No photo was saved.</p>
