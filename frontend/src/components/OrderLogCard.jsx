@@ -19,25 +19,7 @@ export default function OrderLogCard({
   const [deleteError, setDeleteError] = useState("");
 
   const wrapRef = useRef(null);
-  const wheelLockRef = useRef(false);
-
-  function handleWheel(event) {
-    const container = wrapRef.current;
-    if (!container) return;
-    event.preventDefault();
-    if (wheelLockRef.current) return;
-
-    const row = container.querySelector("tbody tr");
-    const step = row ? row.offsetHeight : container.clientHeight;
-    const direction = event.deltaY > 0 ? 1 : -1;
-
-    wheelLockRef.current = true;
-    container.scrollBy({ top: direction * step, behavior: "smooth" });
-    setTimeout(() => {
-      wheelLockRef.current = false;
-    }, 300);
-  }
-
+  
   function handleClearClick() {
     if (orderLog.length === 0) return;
     setDeleteTarget(null);
@@ -133,7 +115,7 @@ export default function OrderLogCard({
           : `${orderLog.length} box${orderLog.length === 1 ? "" : "es"} logged this session`}
       </p>
 
-      <div className="order-table-wrap" ref={wrapRef} onWheel={handleWheel}>
+      <div className={`order-table-wrap${editingId ? " is-editing" : ""}`} ref={wrapRef}>
         <table className="order-table">
           <thead>
             <tr>
@@ -179,18 +161,20 @@ export default function OrderLogCard({
                           </div>
                         </div>
                         {order.has_photo ? (
-                          <div>
-                            <img
-                              className="saved-order-image"
-                              src={`/api/orders/${order.id}/photo/annotated`}
-                              alt="Saved annotated box"
-                            />
+                          <div className="order-photo-links">
                             <a
                               href={`/api/orders/${order.id}/photo/capture`}
                               target="_blank"
                               rel="noreferrer"
                             >
                               Original photo
+                            </a>
+                            <a
+                              href={`/api/orders/${order.id}/photo/annotated`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Annotated photo (with classifications)
                             </a>
                           </div>
                         ) : (

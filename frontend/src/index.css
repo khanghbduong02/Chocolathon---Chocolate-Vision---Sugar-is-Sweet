@@ -249,7 +249,6 @@ select {
   min-height: 120px;
   overflow: hidden;
   gap: 1rem;
-  align-items: start;
 }
 
 .lower-grid.has-review {
@@ -415,7 +414,7 @@ select {
   border-top: 1px solid #d8ceb4;
   scrollbar-width: thin;
   scrollbar-color: #c9b987 transparent;
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
 }
 .review-list::-webkit-scrollbar {
   width: 8px;
@@ -432,11 +431,9 @@ select {
   grid-template-columns: 1fr auto auto 2rem auto 2rem;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.55rem 0; /* slightly tighter too, since text is smaller */
+  padding: 0.55rem 0;
   border-bottom: 1px solid #e3dac4;
   font-size: 0.85rem;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 .review-name strong {
   font-size: 0.9rem;
@@ -487,8 +484,8 @@ select {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  margin-top: 1rem;
-  padding: 0.75rem;
+  margin-top: 0;
+  padding: 1.75rem 0.75rem 0.75rem;
   border-left: 3px solid #b45b3f;
   background: #f3dfd4;
   color: #713c31;
@@ -647,6 +644,9 @@ select {
   scrollbar-color: #c9b987 transparent;
   scroll-snap-type: y mandatory;
   scroll-padding-top: 1.9rem;
+}
+.order-table-wrap.is-editing {
+  max-height: none;
 }
 .order-table-wrap::-webkit-scrollbar {
   width: 8px;
@@ -899,17 +899,15 @@ select {
 .editor-cancel {
   color: #fff7df !important;
 }
-.saved-order-image {
-  width: 100%;
-  max-height: 220px;
-  margin-bottom: 0.5rem;
-  background: #241a10;
-  object-fit: contain;
-}
 .order-edit-layout a {
   color: #6e5513;
   font-size: 0.8rem;
   text-decoration: underline;
+}
+.order-photo-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 .order-audit-summary {
   display: flex;
