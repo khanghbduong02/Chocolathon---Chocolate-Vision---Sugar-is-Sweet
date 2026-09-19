@@ -431,9 +431,10 @@ select {
   grid-template-columns: 1fr auto auto 2rem auto 2rem;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.55rem 0;
+  padding: 1.1rem 0;
   border-bottom: 1px solid #e3dac4;
   font-size: 0.85rem;
+  scroll-snap-align: center;
 }
 .review-name strong {
   font-size: 0.9rem;

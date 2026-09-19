@@ -20,7 +20,6 @@ export default function ReviewPanel({
         <div className="panel-heading">
           <div>
             <span className="eyebrow">Human review</span>
-            <h2>Confirm the final list</h2>
           </div>
         </div>
         <p className="review-intro">
@@ -38,7 +37,6 @@ export default function ReviewPanel({
       <div className="panel-heading">
         <div>
           <span className="eyebrow">Human review</span>
-          <h2>Confirm the final list</h2>
         </div>
         <span
           className={`comparison-badge ${comparison.match ? "match" : "mismatch"}`}
