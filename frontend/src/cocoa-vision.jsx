@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAssemblyAiMic } from "./hooks/useAssemblyAiMic";
 import { useBoxPacking } from "./hooks/useBoxPacking";
 import { BOX_SIZE_OPTIONS } from "./constants/config";
+import { API_BASE_URL, apiFetch } from "./constants/config";
 
 import Header from "./components/Header";
 import BoxSizeSelector from "./components/BoxSizeSelector";
@@ -34,7 +35,7 @@ export default function CocoaVision() {
   );
 
   useEffect(() => {
-    fetch("/api/flavors")
+    apiFetch(`${API_BASE_URL}/api/flavors`)
       .then((response) =>
         response.ok ? response.json() : Promise.reject(new Error()),
       )
