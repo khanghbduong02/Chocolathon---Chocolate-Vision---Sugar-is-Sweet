@@ -2,7 +2,7 @@
 
 export function getBannerCopy(phase, { remaining, elapsed }) {
   const copy = {
-    idle: "Click 'Start New Box' to begin.",
+    idle: "Choose Box size and Click 'Start New Box' to begin.",
     listening: 'Listening… Click "Finish recording and scan box" when done.',
     scanning: "Scanning box… Please wait.",
     review: "Review results, edit if needed, then save.",
