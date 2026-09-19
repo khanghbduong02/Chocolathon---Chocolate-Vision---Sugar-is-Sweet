@@ -72,7 +72,19 @@ export default function ReviewPanel({
                 >
                   −
                 </button>
-                <span className="review-quantity">{row.voiceQty}</span>
+                <input
+                  type="number"
+                  min="0"
+                  className="review-quantity-input"
+                  disabled={!itemsEditable || !editable}
+                  value={row.voiceQty}
+                  onChange={(event) => {
+                    const next = parseInt(event.target.value, 10);
+                    const safeNext = Number.isNaN(next) ? 0 : Math.max(0, next);
+                    onAdjustQty(index, safeNext - row.voiceQty);
+                  }}
+                  aria-label={`Quantity for ${row.name}`}
+                />
                 <button
                   className="icon-button"
                   disabled={!itemsEditable || !editable}
@@ -92,7 +104,7 @@ export default function ReviewPanel({
               </div>
             );
           })
-                ) : (
+        ) : (
           <p className="panel-hint">
             No spoken flavors were recorded. The saved order will use the
             camera-classified quantities below.
