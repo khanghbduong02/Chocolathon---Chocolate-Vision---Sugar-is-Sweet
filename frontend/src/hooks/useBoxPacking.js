@@ -19,6 +19,7 @@ function reducer(state, action) {
   switch (action.type) {
     case "HYDRATE": return { ...state, orderLog: action.orders, boxNumber: action.orders.reduce((max, order) => Math.max(max, Number(order.id) || 0), STARTING_BOX_NUMBER - 1) + 1 };
     case "BEGIN": return { ...initialState, orderLog: state.orderLog, boxNumber: state.boxNumber, phase: "listening" };
+    case "RESET": return { ...initialState, orderLog: state.orderLog, boxNumber: state.boxNumber };
     case "VOICE": return { ...state, voiceItems: action.items };
     case "SCAN_RESULT": return { ...state, phase: "review", cameraItems: action.cameraItems, comparison: action.comparison, photoId: action.photoId, annotatedImage: action.annotatedImage, capturedImage: action.capturedImage };
     case "SET_PHASE": return { ...state, phase: action.phase };
@@ -64,6 +65,8 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
   }, [state.voiceItems]);
 
   const addVoiceMatches = useCallback((matches) => {
+    // Ignore late transcripts that arrive after reset/stop.
+    if (state.phase !== "listening") return;
     dispatch({ type: "VOICE", items: matches.reduce((items, match) => {
       const item = normalizeVoiceItem(match);
       const index = items.findIndex((candidate) => candidate.slug === item.slug || candidate.name === item.name);
@@ -72,7 +75,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
       else items.push(item);
       return items;
     }, [...state.voiceItems]) });
-  }, [state.voiceItems]);
+  }, [state.voiceItems, state.phase]);
 
   function beginBox() {
     stopMic();
@@ -86,9 +89,11 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
 
   function resetToIdle() {
     clearTimer();
+    setElapsed(0);
     stopMic();
     setLiveTranscript("");
-    dispatch({ type: "SET_PHASE", phase: "idle" });
+    setSaveError("");
+    dispatch({ type: "RESET" });
   }
 
   async function finishRecordingAndScan(capture) {
