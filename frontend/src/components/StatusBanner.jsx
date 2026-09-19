@@ -6,9 +6,9 @@ export default function StatusBanner({ phase, boxLocked, remaining, voicePieces,
   const cls = getBannerClass(phase, boxLocked);
 
   return (
-    <div className="w-full px-4 pt-4 flex justify-center">
-      <div className={`inline-flex items-center gap-2.5 rounded-full border py-2.5 px-5 text-base font-semibold transition-colors ${cls}`}>
-        <span className="text-lg leading-none">{icon}</span>
+    <div className="w-full px-4 flex justify-center">
+      <div className={`inline-flex items-center gap-2 rounded-full border py-1.5 px-4 text-sm font-semibold transition-colors ${cls}`}>
+        <span className="text-base leading-none">{icon}</span>
         <span>{copy}</span>
       </div>
     </div>

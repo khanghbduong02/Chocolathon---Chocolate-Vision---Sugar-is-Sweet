@@ -43,8 +43,11 @@ export default function ReviewPanel({ comparison, items, itemsEditable, onAdjust
         }) : (
           <p className="panel-hint">No spoken flavors were recorded. The saved order will use the camera-classified quantities below.</p>
         )}
+        <div className="camera-only-callout">
+          <strong>All camera classifications</strong>
+          <span>{comparison.byFlavor.filter((entry) => entry.cameraQty > 0).map((entry) => `${entry.name} x${entry.cameraQty}`).join(", ") || "No classified items"}</span>
+        </div>
       </div>
-      <div className="camera-only-callout"><strong>All camera classifications</strong><span>{comparison.byFlavor.filter((entry) => entry.cameraQty > 0).map((entry) => `${entry.name} x${entry.cameraQty}`).join(", ") || "No classified items"}</span></div>
       {saveError && <p className="inline-error">{saveError}</p>}
       <button className="button primary save-button" disabled={saving || !items.length} onClick={onSave}>{saving ? "Saving order..." : "Save confirmed order"}</button>
     </section>

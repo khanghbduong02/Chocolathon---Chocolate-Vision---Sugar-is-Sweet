@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ItemEditor from "./ItemEditor";
 
 export default function OrderLogCard({
@@ -17,6 +17,26 @@ export default function OrderLogCard({
   const [deleteText, setDeleteText] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteError, setDeleteError] = useState("");
+
+  const wrapRef = useRef(null);
+  const wheelLockRef = useRef(false);
+
+  function handleWheel(event) {
+    const container = wrapRef.current;
+    if (!container) return;
+    event.preventDefault();
+    if (wheelLockRef.current) return;
+
+    const row = container.querySelector("tbody tr");
+    const step = row ? row.offsetHeight : container.clientHeight;
+    const direction = event.deltaY > 0 ? 1 : -1;
+
+    wheelLockRef.current = true;
+    container.scrollBy({ top: direction * step, behavior: "smooth" });
+    setTimeout(() => {
+      wheelLockRef.current = false;
+    }, 300);
+  }
 
   function handleClearClick() {
     if (orderLog.length === 0) return;
@@ -104,8 +124,7 @@ export default function OrderLogCard({
 
       <div className="order-log-heading">
         <div>
-          <span className="eyebrow">Saved records</span>
-          <h2>Order log</h2>
+          <span className="eyebrow">Order log</span>
         </div>
       </div>
       <p className="order-log-subtitle">
@@ -114,7 +133,7 @@ export default function OrderLogCard({
           : `${orderLog.length} box${orderLog.length === 1 ? "" : "es"} logged this session`}
       </p>
 
-      <div className="order-table-wrap">
+      <div className="order-table-wrap" ref={wrapRef} onWheel={handleWheel}>
         <table className="order-table">
           <thead>
             <tr>

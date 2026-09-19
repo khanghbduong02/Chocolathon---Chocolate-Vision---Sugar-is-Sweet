@@ -1,54 +1,48 @@
+import { Mic, MicOff, Camera, CameraOff } from "lucide-react";
+
 export default function Header({ micOn, cameraReady, elapsed, phase }) {
   return (
-    <header className="cocoa-header w-full flex flex-col items-center gap-4 px-6 py-7 text-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="cocoa-mark h-16 w-16 rounded-xl flex items-center justify-center font-bold text-3xl">
+    <header className="cocoa-header w-full flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+      <div className="flex items-center gap-3">
+        <div className="cocoa-mark h-10 w-10 rounded-lg flex items-center justify-center font-bold text-lg shrink-0">
           CV
         </div>
-        <div>
-          <div className="text-3xl font-bold tracking-tight">Cocoa Vision</div>
-          <div className="cocoa-subtitle text-sm">Bradley Fair</div>
+        <div className="text-left leading-tight">
+          <div className="text-xl font-bold tracking-tight">Cocoa Vision</div>
+          <div className="cocoa-subtitle text-xs">Bradley Fair</div>
         </div>
       </div>
 
-      <div className="flex flex-wrap items-stretch justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         <div
-          className={`flex items-center justify-center gap-3 px-5 py-3 min-w-[180px] rounded-full border ${
-            cameraReady
-              ? "status-chip status-good"
-              : "status-chip status-bad"
-          }`}
+          tabIndex={0}
+          aria-label={cameraReady ? "Camera ready" : "Camera off"}
+          className={`icon-status-chip ${cameraReady ? "status-good" : "status-bad"}`}
         >
-          <span className={`status-dot ${cameraReady ? "good" : "bad"}`} />
-          <span className="text-base font-semibold">
-            {cameraReady ? "Camera ready" : "Camera off"}
+          <span className="chip-icon">
+            {cameraReady ? <Camera size={18} /> : <CameraOff size={18} />}
           </span>
+          <span className="chip-label">{cameraReady ? "Camera ready" : "Camera off"}</span>
         </div>
 
         <div
-          className={`flex items-center justify-center gap-3 px-5 py-3 min-w-[180px] rounded-full border ${
-            micOn
-              ? "status-chip status-good"
-              : "status-chip status-bad"
-          }`}
+          tabIndex={0}
+          aria-label={micOn ? "Mic on" : "Mic off"}
+          className={`icon-status-chip ${micOn ? "status-good" : "status-bad"}`}
         >
-          <span className="relative flex h-3.5 w-3.5 shrink-0">
+          <span className="chip-icon relative">
             {micOn && (
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
             )}
-            <span
-              className={`status-dot ${micOn ? "good" : "bad"}`}
-            />
+            {micOn ? <Mic size={18} /> : <MicOff size={18} />}
           </span>
-          <span className="text-base font-semibold">
-            {micOn ? "Mic on" : "Mic off"}
-          </span>
+          <span className="chip-label">{micOn ? "Mic on" : "Mic off"}</span>
         </div>
 
-        <div className="cocoa-timer flex flex-col items-center justify-center gap-0.5 px-5 py-2 min-w-[110px] rounded-full">
-          <span className="eyebrow text-[0.65rem]">Timer</span>
+        <div className="cocoa-timer flex items-center gap-1.5 px-3 py-1.5 rounded-full">
+          <span className="eyebrow text-[0.6rem]">Timer</span>
           <span
-            className={`font-mono text-2xl font-bold tabular-nums leading-none ${
+            className={`font-mono text-lg font-bold tabular-nums leading-none ${
               phase === "saved" ? "timer-good" : "timer-default"
             }`}
           >

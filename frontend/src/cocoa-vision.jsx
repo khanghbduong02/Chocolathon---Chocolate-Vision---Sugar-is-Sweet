@@ -28,10 +28,22 @@ export default function CocoaVision() {
     setLiveTranscript,
     startMic,
     stopMic,
-  } = useAssemblyAiMic((matches) => handleMatchesRef.current(matches), flavorCatalog);
+  } = useAssemblyAiMic(
+    (matches) => handleMatchesRef.current(matches),
+    flavorCatalog,
+  );
 
   useEffect(() => {
-    fetch("/api/flavors").then((response) => response.ok ? response.json() : Promise.reject(new Error())).then((data) => setFlavorCatalog(data.flavors || [])).catch(() => {});
+    fetch("/api/flavors")
+      .then((response) =>
+        response.ok ? response.json() : Promise.reject(new Error()),
+      )
+      .then((data) => {
+        const flavors = data.flavors || [];
+        const flavorsOnly = flavors.filter((f) => /^[A-Z]/.test(f.name));
+        setFlavorCatalog(flavorsOnly);
+      })
+      .catch(() => {});
   }, []);
 
   const packing = useBoxPacking({
@@ -49,7 +61,12 @@ export default function CocoaVision() {
 
   return (
     <div className="app-shell">
-      <Header micOn={micOn} cameraReady={cameraReady} elapsed={packing.elapsed} phase={packing.phase} />
+      <Header
+        micOn={micOn}
+        cameraReady={cameraReady}
+        elapsed={packing.elapsed}
+        phase={packing.phase}
+      />
 
       <BoxSizeSelector
         boxSize={boxSize}
@@ -67,38 +84,61 @@ export default function CocoaVision() {
       />
 
       {micError && (
-        <div className="inline-error page-error">
-          Microphone: {micError}
-        </div>
+        <div className="inline-error page-error">Microphone: {micError}</div>
       )}
 
       <main className="main-content">
         <div className="work-grid">
-            <CameraPanel ref={cameraRef} phase={packing.phase} micOn={micOn} onCameraReady={setCameraReady} boxLocked={packing.boxLocked} capturedImage={packing.capturedImage} annotatedImage={packing.annotatedImage} />
-            <VoicePanel
-              phase={packing.phase}
-              boxLocked={packing.boxLocked}
-              voiceItems={packing.voiceItems}
-              liveTranscript={liveTranscript}
-              voicePieces={packing.voicePieces}
-              voiceStatus={packing.voiceStatus}
-              boxSize={boxSize}
-            />
+          <CameraPanel
+            ref={cameraRef}
+            phase={packing.phase}
+            micOn={micOn}
+            onCameraReady={setCameraReady}
+            boxLocked={packing.boxLocked}
+            capturedImage={packing.capturedImage}
+            annotatedImage={packing.annotatedImage}
+          />
+          <VoicePanel
+            phase={packing.phase}
+            boxLocked={packing.boxLocked}
+            voiceItems={packing.voiceItems}
+            liveTranscript={liveTranscript}
+            voicePieces={packing.voicePieces}
+            voiceStatus={packing.voiceStatus}
+            boxSize={boxSize}
+          />
         </div>
 
-        {packing.phase === "review" && <ReviewPanel comparison={packing.comparison} items={packing.voiceItems} itemsEditable={packing.itemsEditable} onAdjustQty={packing.adjustItemQty} onRemoveItem={packing.removeItem} onSave={packing.saveOrder} saving={packing.saving} saveError={packing.saveError} />}
+        {packing.saveError && packing.phase !== "review" && (
+          <div className="inline-error page-error">{packing.saveError}</div>
+        )}
 
-        {packing.saveError && packing.phase !== "review" && <div className="inline-error page-error">{packing.saveError}</div>}
+        <div
+          className={`lower-grid${packing.phase === "review" ? " has-review" : ""}`}
+        >
+          {packing.phase === "review" && (
+            <ReviewPanel
+              comparison={packing.comparison}
+              items={packing.voiceItems}
+              itemsEditable={packing.itemsEditable}
+              onAdjustQty={packing.adjustItemQty}
+              onRemoveItem={packing.removeItem}
+              onSave={packing.saveOrder}
+              saving={packing.saving}
+              saveError={packing.saveError}
+            />
+          )}
 
-        <OrderLogCard
-          orderLog={packing.orderLog}
-          flavors={flavorCatalog}
-          onUpdateOrder={packing.updateOrder}
-          onDeleteOrder={packing.deleteOrder}
-          onDownload={packing.downloadOrderLog}
-          onClearLog={packing.clearOrderLog}
-          onOpenInsights={() => setShowInsights(true)}
-        />
+          <OrderLogCard
+            orderLog={packing.orderLog}
+            flavors={flavorCatalog}
+            onUpdateOrder={packing.updateOrder}
+            onDeleteOrder={packing.deleteOrder}
+            onDownload={packing.downloadOrderLog}
+            onClearLog={packing.clearOrderLog}
+            onOpenInsights={() => setShowInsights(true)}
+          />
+        </div>
       </main>
 
       <BoxControls
@@ -106,7 +146,9 @@ export default function CocoaVision() {
         boxLocked={packing.boxLocked}
         onBeginBox={packing.beginBox}
         onReset={packing.resetToIdle}
-        onFinish={() => packing.finishRecordingAndScan(() => cameraRef.current.capture())}
+        onFinish={() =>
+          packing.finishRecordingAndScan(() => cameraRef.current.capture())
+        }
       />
 
       {showInsights && (

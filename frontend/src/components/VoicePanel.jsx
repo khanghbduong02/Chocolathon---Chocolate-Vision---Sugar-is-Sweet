@@ -22,8 +22,7 @@ export default function VoicePanel({
     >
       <div className="panel-heading">
         <div>
-          <span className="eyebrow">Audio input</span>
-          <h2>Spoken flavors</h2>
+          <span className="eyebrow">Spoken flavors</span>
         </div>
         <span className={`camera-status ${isListening ? "ready" : ""}`}>
           {isListening ? "Listening" : "Idle"}
@@ -41,7 +40,7 @@ export default function VoicePanel({
           {voiceItems.map((item, idx) => (
             <span
               key={idx}
-              className="voice-item-chip inline-flex items-center rounded-full font-medium text-base px-4 py-2"
+              className="voice-item-chip inline-flex items-center rounded-full font-medium text-sm px-3 py-1.5"
             >
               {item.quantity > 1 ? `x${item.quantity} ` : ""}
               {item.name}
@@ -54,7 +53,7 @@ export default function VoicePanel({
         )}
 
         {voiceItems.length > 0 && (
-          <span className="panel-muted-total mt-3 text-xl">{voicePieces} pieces spoken</span>
+          <span className="panel-muted-total mt-3 text-lg">{voicePieces} pieces spoken</span>
         )}
         {showNote && (
           <span className={`mt-1 text-sm font-medium ${panelStatusTextClass(voiceStatus)}`}>
