@@ -19,7 +19,10 @@ export default function Header({ micOn, cameraReady, elapsed, phase }) {
           aria-label={cameraReady ? "Camera ready" : "Camera off"}
           className={`icon-status-chip ${cameraReady ? "status-good" : "status-bad"}`}
         >
-          <span className="chip-icon">
+          <span className="chip-icon relative">
+            {cameraReady && (
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+            )}
             {cameraReady ? <Camera size={18} /> : <CameraOff size={18} />}
           </span>
           <span className="chip-label">{cameraReady ? "Camera ready" : "Camera off"}</span>
