@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { compareVoiceAndCamera } from "../utils/compareVoiceAndCamera";
-import { STARTING_BOX_NUMBER } from "../constants/config";
+import { API_BASE_URL, STARTING_BOX_NUMBER } from "../constants/config";
 
 const initialState = {
   phase: "idle",
@@ -53,7 +53,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
 
   useEffect(() => {
     let active = true;
-    fetch("/api/orders").then((response) => response.ok ? response.json() : Promise.reject(new Error("Could not load orders."))).then((data) => { if (active) dispatch({ type: "HYDRATE", orders: data.orders || [] }); }).catch(() => {});
+    fetch(`${API_BASE_URL}/api/orders`).then((response) => response.ok ? response.json() : Promise.reject(new Error("Could not load orders."))).then((data) => { if (active) dispatch({ type: "HYDRATE", orders: data.orders || [] }); }).catch(() => {});
     return () => { active = false; };
   }, []);
 
@@ -102,7 +102,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
       const capturedImage = URL.createObjectURL(blob);
       const form = new FormData();
       form.append("image", blob, "box.jpg");
-      const response = await fetch("/api/scan", { method: "POST", body: form });
+      const response = await fetch(`${API_BASE_URL}/api/scan`, { method: "POST", body: form });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Camera scan failed.");
       const cameraItems = (data.items || []).map((item) => ({ slug: item.slug, name: item.name, quantity: item.quantity }));
@@ -129,7 +129,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
     setSaving(true);
     setSaveError("");
     try {
-      const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+      const response = await fetch(`${API_BASE_URL}/api/orders`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         items: state.voiceItems,
         transcript_items: state.voiceItems,
         camera_items: state.cameraItems,
@@ -146,7 +146,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
   }
 
   async function updateOrder(orderId, items, boxSizeOverride, comparisonStatus) {
-    const response = await fetch(`/api/orders/${orderId}`, {
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ items, box_size: boxSizeOverride ?? null, comparison_status: comparisonStatus }),
@@ -157,7 +157,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
   }
 
   async function deleteOrder(orderId) {
-    const response = await fetch(`/api/orders/${orderId}`, { method: "DELETE" });
+    const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, { method: "DELETE" });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Could not delete order.");
     dispatch({ type: "DELETE_ORDER", orderId });
@@ -170,7 +170,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
   }
 
   async function clearOrderLog() {
-    const response = await fetch("/api/orders", { method: "DELETE" });
+    const response = await fetch(`${API_BASE_URL}/api/orders`, { method: "DELETE" });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Could not delete logs.");
     dispatch({ type: "CLEAR" });

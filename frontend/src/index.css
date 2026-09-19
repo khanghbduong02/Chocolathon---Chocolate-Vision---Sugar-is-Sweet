@@ -23,7 +23,11 @@
 /* --- Viewport lock: nothing outside a panel's own content should ever
    scroll the page. html/body/#root are pinned to the viewport height, and
    .app-shell is capped at 100dvh (not 100vh) so mobile browser chrome
-   showing/hiding doesn't cause a layout jump or a sliver of scroll. --- */
+   showing/hiding doesn't cause a layout jump or a sliver of scroll.
+   NOTE: this lock is DESKTOP-ONLY behavior now - the mobile media query
+   near the bottom of this file deliberately unlocks it, since a fixed,
+   zero-scroll dashboard squeezing four panels onto a phone screen isn't
+   legible at that width. --- */
 html,
 body,
 #root {
@@ -971,33 +975,110 @@ select {
   letter-spacing: 0.08em;
 }
 
-/* --- Narrower screens: Camera + Voice go side-by-side (not stacked) so
-   we don't double the vertical space needed — a stacked layout is what
-   forces scrolling on phones. --- */
+/* ==========================================================================
+   PHONE LAYOUT (max-width: 640px)
+   --------------------------------------------------------------------------
+   Deliberately a different layout, not a shrunk version of the desktop one.
+   Desktop is a fixed, zero-scroll dashboard because it's meant to sit on a
+   counter screen where every panel should be visible at once. That doesn't
+   translate to a phone: cramming camera + voice + review + order log into
+   one small viewport at once means every panel gets a sliver of space, and
+   a live video feed or a flavor list isn't usable at that size.
+
+   Instead, phone gets the more standard mobile pattern: unlock page scroll,
+   stack every section full-width in one column, and give each section a
+   real, comfortable height. Scrolling vertically is a normal, expected
+   phone interaction - it's not a compromise the way it would be on desktop.
+   ========================================================================== */
 @media (max-width: 640px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow: auto;
+  }
+  .app-shell {
+    height: auto;
+    min-height: 100dvh;
+    max-height: none;
+    overflow: visible;
+    gap: 0;
+  }
+  .main-content {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+    padding: 0.85rem;
+    gap: 0.85rem;
+  }
+
+  /* Camera and Voice stack full-width instead of squeezing side by side. */
   .work-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    min-height: 0;
+    gap: 0.85rem;
   }
+  .work-grid > * {
+    min-height: 300px;
+  }
+  .camera-frame {
+    max-height: none;
+  }
+
+  /* Review panel + order log also stack, and are no longer height-capped -
+     each grows to fit its content, and the page scrolls past them. */
+  .lower-grid,
   .lower-grid.has-review {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+    gap: 0.85rem;
   }
+  .lower-grid > * {
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  .order-log-panel {
+    max-height: none;
+  }
+  .review-list {
+    max-height: 50vh;
+  }
+  .order-table-wrap {
+    max-height: 45vh;
+  }
+
   .camera-panel,
   .review-panel,
-  .work-grid > * {
-    padding: 0.75rem;
+  .work-grid > *,
+  .lower-grid > * {
+    padding: 0.9rem;
   }
   .panel-heading h2 {
     font-size: 1.15rem;
   }
+  .panel-hint,
+  .review-intro,
+  .order-log-subtitle {
+    display: block;
+  }
   .review-row {
-    grid-template-columns: 1fr auto auto 1.6rem auto 1.6rem;
+    grid-template-columns: 1fr auto auto 1.8rem auto 1.8rem;
   }
   .camera-quantity {
     grid-column: 1 / -1;
   }
+
   .control-bar {
     flex-wrap: wrap;
+    flex: none;
+    padding: 0 0.85rem 0.85rem;
   }
   .control-button,
   .reset-button {
@@ -1016,9 +1097,11 @@ select {
 /* --- Short / landscape screens (the hardest case: plenty of width, very
    little height — a phone turned sideways, or a small laptop window).
    Targeted by height, not width, since that's the actual constraint here.
-   Trims non-essential copy and chrome padding to reclaim vertical space
-   rather than letting anything force a page scroll. --- */
-@media (max-height: 720px) {
+   This still applies to desktop-width-but-short windows, where the
+   zero-scroll dashboard is kept and just needs trimming, NOT the phone
+   layout above (that's gated on width, this is gated on height, so a
+   short desktop window and a narrow phone are handled independently). --- */
+@media (max-height: 720px) and (min-width: 641px) {
   .main-content {
     padding: 0.5rem 0.75rem;
     gap: 0.5rem;

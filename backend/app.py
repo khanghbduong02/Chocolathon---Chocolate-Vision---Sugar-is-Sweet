@@ -18,6 +18,10 @@ orders.csv. Existing rows can be edited the same way.
 
 After `npm run build` in frontend/, this process can also serve the UI at
 http://127.0.0.1:5000.
+
+CORS is locked to a single allowed origin (ALLOWED_ORIGIN below) rather than
+"*" - the deployed frontend lives at a fixed Vercel URL, so there's no need
+to accept requests from anywhere else.
 """
 
 from __future__ import annotations
@@ -65,6 +69,13 @@ WEIGHT_CANDIDATES = [
     ROOT / "yolov8n.pt",
     ROOT / "yolov8s.pt",
 ]
+
+# Single allowed frontend origin. Override via the ALLOWED_ORIGIN env var
+# (in backend/.env) if you ever need a different deployed URL without
+# editing code - it's read once at import time, same as the weights list.
+ALLOWED_ORIGIN = os.getenv(
+    "ALLOWED_ORIGIN", "https://chocolathon-chocolate-vision-sugar.vercel.app"
+).rstrip("/")
 
 app = Flask(__name__, static_folder=None)
 _csv_lock = threading.Lock()
@@ -332,9 +343,15 @@ def detect(image):
 
 @app.after_request
 def add_cors(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
+    # Reflect the origin ONLY when it matches the allowed frontend, instead
+    # of a blanket "*" - a request from anywhere else gets no CORS headers
+    # at all, so the browser blocks it client-side.
+    origin = request.headers.get("Origin", "")
+    if origin.rstrip("/") == ALLOWED_ORIGIN:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Vary"] = "Origin"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
 
 
@@ -558,6 +575,7 @@ def main():
 
     print(f"Orders CSV: {ORDERS_CSV}")
     print(f"API: http://{args.host}:{args.port}")
+    print(f"Allowed frontend origin (CORS): {ALLOWED_ORIGIN}")
     print("React UI: cd frontend && npm run dev  ->  http://127.0.0.1:5173")
     app.run(host=args.host, port=args.port, debug=False, threaded=True)
 
