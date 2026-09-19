@@ -127,6 +127,8 @@ export default function CocoaVision() {
               onSave={packing.saveOrder}
               saving={packing.saving}
               saveError={packing.saveError}
+              flavors={flavorCatalog}
+              onAddItem={packing.addItem}
             />
           )}
 

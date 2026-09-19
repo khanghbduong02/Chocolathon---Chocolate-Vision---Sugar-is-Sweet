@@ -126,9 +126,20 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
 
   function removeItem(index) { dispatch({ type: "VOICE", items: state.voiceItems.filter((_, itemIndex) => itemIndex !== index) }); }
 
-  const comparison = state.cameraItems.length > 0
+  function addItem(name, quantity = 1) {
+    if (state.phase !== "review") return;
+    const item = normalizeVoiceItem({ name, quantity });
+    if (!item.name || item.quantity < 1) return;
+    const existing = state.voiceItems.findIndex((candidate) => candidate.slug === item.slug);
+    const items = existing >= 0
+      ? state.voiceItems.map((candidate, index) => index === existing ? { ...candidate, quantity: candidate.quantity + item.quantity } : candidate)
+      : [...state.voiceItems, item];
+    dispatch({ type: "VOICE", items });
+  }
+
+  const comparison = state.comparison
     ? compareVoiceAndCamera(state.voiceItems, state.cameraItems)
-    : state.comparison;
+    : null;
 
   async function saveOrder() {
     if (!comparison || saving) return;
@@ -186,7 +197,7 @@ export function useBoxPacking({ startMic, stopMic, setLiveTranscript, boxSize })
     ...state, elapsed, saving, saveError, voiceItems: state.voiceItems, itemsEditable: state.phase === "review" && !state.boxLocked,
     voicePieces: state.voiceItems.reduce((sum, item) => sum + item.quantity, 0),
     remaining: Math.max(boxSize - state.voiceItems.reduce((sum, item) => sum + item.quantity, 0), 0),
-    beginBox, resetToIdle, finishRecordingAndScan, addVoiceMatches, setVoiceItems, adjustItemQty, removeItem, saveOrder, updateOrder, deleteOrder, downloadOrderLog, clearOrderLog,
+    beginBox, resetToIdle, finishRecordingAndScan, addVoiceMatches, setVoiceItems, adjustItemQty, removeItem, addItem, saveOrder, updateOrder, deleteOrder, downloadOrderLog, clearOrderLog,
     comparison,
   };
 }
