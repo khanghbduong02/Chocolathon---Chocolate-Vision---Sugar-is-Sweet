@@ -70,12 +70,20 @@ WEIGHT_CANDIDATES = [
     ROOT / "yolov8s.pt",
 ]
 
-# Single allowed frontend origin. Override via the ALLOWED_ORIGIN env var
-# (in backend/.env) if you ever need a different deployed URL without
-# editing code - it's read once at import time, same as the weights list.
-ALLOWED_ORIGIN = os.getenv(
-    "ALLOWED_ORIGIN", "https://chocolathon-chocolate-vision-sugar.vercel.app"
-).rstrip("/")
+# Allowed frontend origins, comma-separated. Override via the ALLOWED_ORIGINS
+# env var (in backend/.env) - defaults cover the deployed Vercel site plus
+# local Vite dev servers, so testing from localhost doesn't trip CORS while
+# still keeping anything else out.
+ALLOWED_ORIGINS = {
+    origin.strip().rstrip("/")
+    for origin in os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://chocolathon-chocolate-vision-sugar.vercel.app,"
+        "http://localhost:5173,"
+        "http://127.0.0.1:5173",
+    ).split(",")
+    if origin.strip()
+}
 
 app = Flask(__name__, static_folder=None)
 _csv_lock = threading.Lock()
@@ -343,11 +351,11 @@ def detect(image):
 
 @app.after_request
 def add_cors(response):
-    # Reflect the origin ONLY when it matches the allowed frontend, instead
-    # of a blanket "*" - a request from anywhere else gets no CORS headers
-    # at all, so the browser blocks it client-side.
+    # Reflect the origin ONLY when it's in the allowed set, instead of a
+    # blanket "*" - a request from anywhere else gets no CORS headers at
+    # all, so the browser blocks it client-side.
     origin = request.headers.get("Origin", "")
-    if origin.rstrip("/") == ALLOWED_ORIGIN:
+    if origin.rstrip("/") in ALLOWED_ORIGINS:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Vary"] = "Origin"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
@@ -575,7 +583,7 @@ def main():
 
     print(f"Orders CSV: {ORDERS_CSV}")
     print(f"API: http://{args.host}:{args.port}")
-    print(f"Allowed frontend origin (CORS): {ALLOWED_ORIGIN}")
+    print(f"Allowed frontend origins (CORS): {', '.join(sorted(ALLOWED_ORIGINS))}")
     print("React UI: cd frontend && npm run dev  ->  http://127.0.0.1:5173")
     app.run(host=args.host, port=args.port, debug=False, threaded=True)
 
